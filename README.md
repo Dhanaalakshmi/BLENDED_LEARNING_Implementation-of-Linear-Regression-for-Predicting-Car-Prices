@@ -1,5 +1,7 @@
-# BLENDED_LEARNING
-# Implementation-of-Linear-Regression-for-Predicting-Car-Prices
+# Ex:01 Implementation-of-Linear-Regression-for-Predicting-Car-Prices
+
+<H3>DATE:</H3>
+
 ## AIM:
 To write a program to predict car prices using a linear regression model and test the assumptions for linear regression.
 
@@ -19,18 +21,17 @@ To write a program to predict car prices using a linear regression model and tes
 9. **Output Results**: Present the predictions and evaluation metrics.
 
 ## Program:
-```py
 
-#Program to implement linear regression model for predicting car prices and test assumptions.
-#Developed by: DHANALAKSHMI A
-#RegisterNumber: 212223040033
+```py
 
 # Import necessary libraries
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import seaborn as sns
 
 # Load the dataset from the URL
 data = pd.read_csv("https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBM-ML240EN-SkillsNetwork/labs/data/CarPrice_Assignment.csv")
@@ -45,7 +46,16 @@ data = data.dropna()  # Drop rows with missing values
 # Select features and target variable
 # Assume 'price' is the target variable and 'horsepower', 'curbweight', 'enginesize', and 'highwaympg' are features
 X = data[['horsepower', 'curbweight', 'enginesize', 'highwaympg']]
+
 y = data['price']
+
+# Standardize the features
+SS = StandardScaler()
+
+X = SS.fit_transform(X)
+y = SS.fit_transform(y.values.reshape(-1, 1))
+
+
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -63,6 +73,18 @@ print("Mean Squared Error:", mean_squared_error(y_test, y_pred))
 print("R² Score:", r2_score(y_test, y_pred))
 
 # Check model assumptions
+# 1. Linearity Assumption
+plt.figure(figsize=(10, 6))
+for i, col in enumerate(['horsepower', 'curbweight', 'enginesize', 'highwaympg']):
+    plt.subplot(2, 2, i+1)
+    plt.scatter(data[col], data['price'])
+    plt.xlabel(col)
+    plt.ylabel('Price')
+    plt.title(f'Price vs {col}')
+plt.tight_layout()
+plt.show()
+
+# 2. Homoscedasticity
 plt.scatter(y_pred, y_test - y_pred)
 plt.xlabel('Predicted Prices')
 plt.ylabel('Residuals')
@@ -70,15 +92,27 @@ plt.title('Residuals vs Predicted Prices')
 plt.axhline(0, color='red', linestyle='--')
 plt.show()
 
+# 3. Normality
+plt.figure(figsize=(10, 6))
+plt.hist(y_test - y_pred, bins=30)
+plt.xlabel('Residuals')
+plt.ylabel('Frequency')
+plt.title('Histogram of Residuals')
+plt.show()
+
+# 4. Multicollinearity
+corr_matrix = data[['horsepower', 'curbweight', 'enginesize', 'highwaympg']].corr()
+plt.figure(figsize=(8, 6))
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', linewidths=0.5)
+plt.title('Correlation Matrix')
+plt.show()
+
 
 ```
 
-
 ## Output:
-![image](https://github.com/user-attachments/assets/9229a736-d29a-4b2f-b115-0e4091d233c6)
-![image](https://github.com/user-attachments/assets/f97fd5f1-8432-414d-8087-cd7967f839f8)
 
-
+![image](https://github.com/user-attachments/assets/fb4b80af-d040-4a74-a438-b1397cbebae1)
 
 
 ## Result:
